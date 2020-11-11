@@ -11,7 +11,7 @@ type Provider struct {
 }
 
 type Module struct {
-   providers map[string]*Provider
+    providers map[string]*Provider
 }
 
 func NewModule() *Module {
@@ -20,8 +20,10 @@ func NewModule() *Module {
     }
 }
 
-func (module *Module) Add(provider *Provider) {
-    module.providers[provider.Name] = provider
+func (module *Module) Add(providers ...Provider) {
+    for _, provider := range providers {
+        module.providers[provider.Name] = &provider
+    }
 }
 
 func (module Module) Get(name string) (interface{}, error) {
