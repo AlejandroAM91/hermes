@@ -1,6 +1,12 @@
 package dimgr
 
+import (
+    "errors"
+)
+
 type Provider struct {
+    Create   func() interface{}
+    Name     string
     Instance interface{}
 }
 
@@ -14,10 +20,20 @@ func NewModule() *Module {
     }
 }
 
-func (m *Module) AddProvider(name string, provider *Provider) {
-    m.providers[name] = provider
+func (module *Module) Add(provider *Provider) {
+    module.providers[provider.Name] = provider
 }
 
-func (m Module) GetProvider(name string) *Provider {
-    return m.providers[name]
+func (module Module) Get(name string) (interface{}, error) {
+    provider := module.providers[name]
+    if provider == nil {
+        return nil, errors.New("No existing provider: " + name)
+    }
+
+    // Creates the instance the first time
+    if provider.Instance == nil {
+        provider.Instance = provider.Create()
+    }
+    return provider.Instance, nil
 }
+
